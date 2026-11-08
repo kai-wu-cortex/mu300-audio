@@ -132,7 +132,13 @@ class Portability(unittest.TestCase):
         src = VOICE.read_text()
         code = '\n'.join(l for l in src.splitlines() if not l.lstrip().startswith('#'))
         # every fractional wait goes through nap; only nap itself may hand sleep a fraction
-        self.assertNotRegex(code.replace('if sleep 0.01 2>/dev/null', ''), r'\bsleep +"?[0-9]*\.[0-9]')
+        probes = (
+            'if sleep 0.01 2>/dev/null',
+            'elif [ -x /opt/mu300/bin/busybox ] && /opt/mu300/bin/busybox sleep 0.01 2>/dev/null',
+        )
+        for probe in probes:
+            code = code.replace(probe, '')
+        self.assertNotRegex(code, r'\bsleep +"?[0-9]*\.[0-9]')
         self.assertIn('nap 0.1', code)
 
     def test_nap_falls_back_to_whole_seconds(self):

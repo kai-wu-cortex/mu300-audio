@@ -99,6 +99,8 @@ CAP_NODE=/dev/snd/pcmC${card}D${CAP_DEV}c
 # a whole second (the loops then wait longer, never shorter).
 if sleep 0.01 2>/dev/null; then
     nap() { sleep "$1"; }
+elif [ -x /opt/mu300/bin/busybox ] && /opt/mu300/bin/busybox sleep 0.01 2>/dev/null; then
+    nap() { /opt/mu300/bin/busybox sleep "$1"; }
 elif command -v usleep >/dev/null 2>&1; then
     nap() { usleep "$(awk -v s="$1" 'BEGIN { printf "%d", s * 1000000 }')"; }
 else
